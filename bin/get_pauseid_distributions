@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# PODNAME: get_pauseid_distributions
+
 use strict;
 use warnings FATAL => 'all';
 use feature 'say';
