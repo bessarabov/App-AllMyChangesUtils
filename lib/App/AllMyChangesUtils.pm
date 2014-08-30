@@ -6,7 +6,7 @@ package App::AllMyChangesUtils;
 
 =head1 DESCRIPTION
 
-Several scripts that help loading data to the site L< http://allmychanges.com>
+Several scripts that help loading data to the site L<http://allmychanges.com>
 
 =cut
 
