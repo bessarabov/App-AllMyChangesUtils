@@ -8,10 +8,9 @@ use feature 'say';
 use utf8;
 use open qw(:std :utf8);
 
-use Data::Printer;
 use ElasticSearch;
-use LWP::Simple;
-use JSON;
+use HTTP::Tiny;
+use JSON::PP;
 
 sub get_es {
     my $es = ElasticSearch->new(
@@ -80,8 +79,9 @@ sub get_distributions_liked_by_user {
 sub get_distribution_repository {
     my ($d) = @_;
 
-    my $json = get("http://api.metacpan.org/v0/release/$d");
-    my $data = from_json($json);
+    my $response = HTTP::Tiny->new->get("http://api.metacpan.org/v0/release/$d");
+    my $json = $response->{content};
+    my $data = decode_json($json);
 
     my $repository_url = $data->{resources}->{repository}->{url};
 
