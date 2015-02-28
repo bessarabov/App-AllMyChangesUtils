@@ -23,9 +23,9 @@ sub get_repos_liked_by_user {
     my @repos;
     foreach my $d (@{$data}) {
         push @repos, {
-            name => $d->{name},
+            name => lc($d->{name}),
             url => $d->{clone_url},
-            language => $d->{language},
+            language => lc($d->{language} // 'unknown'),
         };
     }
     return @repos;
@@ -45,7 +45,7 @@ sub main {
     say 'namespace,name,source';
 
     foreach my $r (@repos) {
-        my $language = $r->{language} // 'unknown';
+        my $language = $r->{language};
         say
             $language . ','
             . $r->{name} . ','
