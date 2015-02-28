@@ -10,3 +10,8 @@ Revision history for App::AllMyChangesUtils
 1.0.2   2014-11-15
         [Patch]
         * Added dependency IO::Socket::SSL
+
+1.0.3   2015-02-28
+        [Patch]
+        * Fixing dependencies
+        * Using lowercase namespace and name in `get_github_favorites` (HEAD, master)
