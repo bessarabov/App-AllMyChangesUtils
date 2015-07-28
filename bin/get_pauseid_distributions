@@ -8,73 +8,7 @@ use feature 'say';
 use utf8;
 use open qw(:std :utf8);
 
-use ElasticSearch;
-use HTTP::Tiny;
-use JSON::PP;
-
-sub get_es {
-    my $es = ElasticSearch->new(
-        no_refresh  => 1,
-        servers     => 'api.metacpan.org',
-    );
-
-    return $es;
-}
-
-sub get_distributions_user {
-    my ($pause_id) = @_;
-
-    my $data = get_es()->search(
-        index  => 'v0',
-        type   => 'release',
-        fields => [qw(
-            name
-            author
-            distribution
-            status
-        )],
-        query  => {
-            filtered => {
-                query  => { match_all => {} },
-                "filter" => {
-                    "and" => [
-                        {
-                            "term" => {
-                                author => $pause_id,
-                            }
-                        },
-                        {
-                            "term" => {
-                                "status" => "latest"
-                            }
-                        }
-                    ]
-                },
-            },
-        },
-        size => 100,
-    );
-
-    my @d;
-
-    foreach my $el (@{$data->{hits}->{hits}}) {
-        push @d, $el->{fields}->{distribution};
-    }
-
-    return @d;
-}
-
-sub get_distribution_repository {
-    my ($d) = @_;
-
-    my $response = HTTP::Tiny->new->get( "http://api.metacpan.org/v0/release/$d");
-    my $json = $response->{content};
-    my $data = decode_json($json);
-
-    my $repository_url = $data->{resources}->{repository}->{url};
-
-    return $repository_url;
-}
+use MetaCPAN::Client;
 
 sub main {
 
@@ -85,14 +19,20 @@ sub main {
         exit 1;
     }
 
-    my @distributions = get_distributions_user($pause_id);
+    my $mc = MetaCPAN::Client->new();
+    my $data = $mc->release({
+        all => [
+            { author => $pause_id },
+            { status => 'latest' },
+        ]
+    });
 
     say 'namespace,name,source';
 
-    foreach my $d (@distributions) {
-        my $url = get_distribution_repository($d);
+    while (my $element = $data->next) {
+        my $url = $element->{data}->{resources}->{repository}->{url};
 
-        my $module = $d;
+        my $module = $element->{data}->{distribution};
         $module =~ s/-/::/g;
 
         if (defined $url) {
@@ -101,7 +41,7 @@ sub main {
                 . $url
                 ;
         } else {
-            warn "WARNING: no info about repostitory url for $d\n";
+            warn "WARNING: no info about repostitory url for $module\n";
         }
     }
 
