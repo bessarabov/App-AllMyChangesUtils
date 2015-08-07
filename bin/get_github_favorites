@@ -22,7 +22,6 @@ sub get_repos_liked_by_user {
     my $url = "https://api.github.com/users/$github_login/starred";
 
     while ($url) {
-        say $url;
         my $response = HTTP::Tiny->new->get($url);
 
         if ( $response->{headers}->{link} =~ /<(.*?)>; rel="next"/ ) {
