@@ -22,3 +22,7 @@ Revision history for App::AllMyChangesUtils
         * Fixing get_pauseid_distributions (it was broken because ElasticSearch was renamed to Search::Elasticsearch)
         * Fixing get_github_favorites to return all starred repositories instead of first 30
         * Using https instead of http link to allmychanges.com
+
+1.0.5   2015-08-07
+        [Patch]
+        * Removed debug output
